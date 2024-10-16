@@ -2,8 +2,10 @@ import requests
 import selectorlib
 import datetime
 import time
+import sqlite3 as sql
 
 URL = 'http://programmer100.pythonanywhere.com/'
+connection = sql.connect('sqldb.db')
 
 def get_date_temp():
     def scrape(url):
@@ -21,8 +23,9 @@ def get_date_temp():
     def store(extracted):
         now = datetime.datetime.now()
         fnow = now.strftime("%y-%m-%d-%H-%M-%S")
-        with open("data.txt",'a') as file:
-            file.write(f'\n{fnow},{extracted}')  
+        cursor = connection.cursor()
+        cursor.execute("insert into temp values(?,?)", (fnow,extracted))
+        connection.commit()
 
     while True:
         scraped = scrape(URL)
@@ -32,4 +35,4 @@ def get_date_temp():
         time.sleep(2)
 
 if __name__ == "__main__":
-    print("dont")     
+    get_date_temp()     
